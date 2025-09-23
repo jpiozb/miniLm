@@ -3,7 +3,7 @@ name: Docker Image CI
 on: 
   push:
     branches:
-      - master # Assuming 'master' is the default branch name
+      - main # Assuming 'main' is the default branch name
 
 jobs:
   build-and-push:
@@ -28,6 +28,6 @@ jobs:
         context: .
         platforms: linux/arm64
         push: true
-        tags: ${{ secrets.DOCKER_USERNAME }}/minilm:latest # Use the username from secrets
+        tags: jpiozb/minilm:latest # Use the username from secrets
         cache-from: type=gha
         cache-to: type=gha,mode=max

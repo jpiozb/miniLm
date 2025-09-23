@@ -3,7 +3,7 @@ name: Docker Image CI
 on: 
   push:
     branches:
-      - main # Assuming 'main' is the default branch name
+      - master # Assuming 'master' is the default branch name
 
 jobs:
   build-and-push:

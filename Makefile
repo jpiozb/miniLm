@@ -1,12 +1,10 @@
 IMAGE_NAME := joon78/minilm
 TAG := latest
 
-.PHONY: all build push
+.PHONY: update-embeddings docker
 
-all: push
+docker:
+	docker buildx build --no-cache --platform linux/arm64 -t $(IMAGE_NAME):$(TAG) .
 
-build:
-	docker buildx build --platform linux/arm64 -t $(IMAGE_NAME):$(TAG) .
-
-push: build
-	docker push $(IMAGE_NAME):$(TAG)
+update-embeddings:
+	.venv/bin/python3 app.py

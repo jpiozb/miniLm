@@ -13,6 +13,22 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Cache Python dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Cache Sentence-Transformers model
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/huggingface/hub # Or ~/.cache/torch if models are stored there
+        key: ${{ runner.os }}-sbert-model-${{ hashFiles('app.py') }} # Hash app.py as model is loaded there
+        restore-keys: |
+          ${{ runner.os }}-sbert-model-
+
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 

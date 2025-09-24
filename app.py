@@ -5,7 +5,7 @@ from psycopg2.extras import execute_batch
 from dotenv import load_dotenv
 import socket
 from urllib.parse import urlparse, urlunparse
-import time
+import select
 
 load_dotenv()
 
@@ -52,7 +52,7 @@ def update_embeddings_logic(conn):
         # No conn.close() here, as connection is managed externally
         print(f"Total updated keywords in this run: {total_updated_count}")
 
-if __name__ == "__main__":
+def listen_for_notifications():
     conn = None
     while True:
         try:
@@ -77,18 +77,35 @@ if __name__ == "__main__":
                         print(f"Could not resolve hostname {hostname}: {e}. Proceeding with the original URL.")
 
                 conn = psycopg2.connect(postgres_url)
+                conn.autocommit = True
                 # Register pgvector for the connection
                 from pgvector.psycopg2 import register_vector
                 register_vector(conn)
                 print("Database connection established.")
 
+                with conn.cursor() as cur:
+                    cur.execute("LISTEN new_keyword;")
+                    print("Listening for 'new_keyword' notifications...")
+
+            # Initially, run the update logic to clear any backlog
             update_embeddings_logic(conn)
 
-        except Exception as e:
+            while True:
+                if select.select([conn], [], [], 60) == ([], [], []):
+                    print("Timeout: No notifications received in 60 seconds. Checking for work...")
+                    update_embeddings_logic(conn)
+                else:
+                    conn.poll()
+                    while conn.notifies:
+                        notify = conn.notifies.pop(0)
+                        print(f"Got NOTIFY: {notify.pid}, {notify.channel}, {notify.payload}")
+                        update_embeddings_logic(conn)
+
+        except (Exception, psycopg2.DatabaseError) as e:
             print(f"An error occurred in the main loop: {e}")
             if conn and not conn.closed:
                 conn.close()
             conn = None # Force re-establishment of connection
 
-        print("\nWaiting for 1 second before the next run...\n")
-        time.sleep(1)
+if __name__ == "__main__":
+    listen_for_notifications()

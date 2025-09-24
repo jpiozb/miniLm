@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest # Use ubuntu-latest for x86_64 host, or self-hosted for ARM if available
+    runs-on: ubuntu-22.04-arm64 # Use ubuntu-latest for x86_64 host, or self-hosted for ARM if available
 
     steps:
     - name: Checkout code
@@ -44,6 +44,6 @@ jobs:
         context: .
         platforms: linux/arm64
         push: true
-        tags: jpiozb/minilm:latest # Use the username from secrets
+        tags: joon78/kairox-ve:latest # Use the username from secrets
         cache-from: type=gha
         cache-to: type=gha,mode=max

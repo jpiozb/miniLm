@@ -1,12 +1,3 @@
-# syntax=docker/dockerfile:1
-FROM python:3.10-slim
-ENV PYTHONUNBUFFERED=1
+FROM semitechnologies/transformers-inference:sentence-transformers-all-MiniLM-L6-v2-1.8.5
 
-WORKDIR /app
-
-COPY requirements.txt .
-RUN python -m pip install -r requirements.txt
-
-COPY app.py .
-
-CMD ["python", "app.py"]
+EXPOSE 8080

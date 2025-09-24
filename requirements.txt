@@ -1,5 +1,0 @@
-sentence-transformers
-torch
-psycopg2-binary
-python-dotenv
-pgvector

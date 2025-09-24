@@ -8,6 +8,7 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-22.04-arm # Use ubuntu-latest for x86_64 host, or self-hosted for ARM if available
+    # Re-running for public repo
 
     steps:
     - name: Checkout code
